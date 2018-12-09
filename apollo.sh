@@ -207,12 +207,9 @@ refreshURL() {
 }
 
 diffXMLsAndReplace() {
+  echo "  Diff:"
   colordiff "${xml_path}" itunes.xml.new
-  echo "  Diff Ok [Y/n]?"
-  continue_code=$(promptToContinue)
-  if [ "${continue_code}" == "0" ]; then
-    mv itunes.xml.new "${xml_path}"
-  fi
+  mv itunes.xml.new "${xml_path}"
 }
 
 fullEpisodeUpload() {

@@ -41,8 +41,8 @@ promptToContinue() {
   read -p "$1 (y/N) " yn
   tput sgr0
   case $yn in
-      [Yy] ) return 0;;
-      [Nn] ) return 1;;
+      [Yy] ) echo "0";;
+      [Nn] ) echo "1";;
       * ) echo "Please answer y or n for yes or no.";;
   esac
 }
