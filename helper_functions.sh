@@ -45,8 +45,8 @@ promptToContinue() {
       yn='N'
     fi
     case $yn in
-        [Yy] ) break;;
-        [Nn] ) exit 1;;
+        [Yy] ) return 0;;
+        [Nn] ) return 1;;
         * ) echo "Please answer y or n for yes or no.";;
     esac
   done
