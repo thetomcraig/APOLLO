@@ -37,17 +37,12 @@ echoCyan() {
 }
 
 promptToContinue() {
-  while true; do
-    tput bold
-    read -p "$1 (y/N) " yn
-    tput sgr0
-    if [ "$yn" = "" ]; then
-      yn='N'
-    fi
-    case $yn in
-        [Yy] ) return 0;;
-        [Nn] ) return 1;;
-        * ) echo "Please answer y or n for yes or no.";;
-    esac
-  done
+  tput bold
+  read -p "$1 (y/N) " yn
+  tput sgr0
+  case $yn in
+      [Yy] ) return 0;;
+      [Nn] ) return 1;;
+      * ) echo "Please answer y or n for yes or no.";;
+  esac
 }
