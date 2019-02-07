@@ -186,24 +186,26 @@ lint() {
 }
 
 pushXML() {
+  path_to_xml=$1
+
   echo -n "Pushing to GitHub..."
   # Do the uploading of the xml and validate
   date=$(date '+%a, %d %b %Y')
   # TODO update readme list
-  git add itunes.xml
+  # TODO extract the path from this and cd to it
+  cd $(dirname "${path_to_xml}")
+  git add $(basename "${path_to_xml}")
   git commit -m "Episode added for $date"
   git push
   echo "Done"
 }
 
 validateXML() {
-  echo "  Validated? Answer after success [y/N]:"
   open ${validator_url}
 }
 
 refreshURL() {
   open "https://podcastsconnect.apple.com/"
-  echo "  Refreshed? [y/N]:"
 }
 
 diffXMLsAndReplace() {
@@ -215,7 +217,7 @@ diffXMLsAndReplace() {
 fullEpisodeUpload() {
   uploadMp3sToS3 $1
   updateXMLForAllMp3s $1
-  pushXML
+  pushXML $1
   validateXML
   refreshURL
   cleanupRootDirectory
@@ -260,6 +262,7 @@ helpStringFunction() {
 }
 
 case $1 in
+
     -h*|--help)
       helpStringFunction
     ;;
@@ -278,7 +281,8 @@ case $1 in
       updateXMLForAllMp3s $2 $3
     ;;
     -p|--push)
-      pushXML
+      # $2 - path to itunes XML file
+      pushXML $2
     ;;
 
     -v|--validate)
