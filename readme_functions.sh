@@ -1,10 +1,14 @@
+#!/usr/bin/env bash
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/helper_functions.sh
-source ${DIR}/git_functions.sh
 
+release_date=$(date '+%a %d %b %Y')
+template_filename=./episode_hunk.xml
 new_hunk_filename="${template_filename}.new"
 validator_url="http://castfeedvalidator.com/?url=https://raw.githubusercontent.com/thetomcraig/total-immersion-podcast/master/xml_stuff/itunes.xml"
 s3_search_prefix="https://console.aws.amazon.com/s3/buckets/total-immersion-podcast/?region=us-west-2&tab=overview&prefixSearch=EP"
+readme_new_episode_line="| ------ | ---------- | -------------- | ----- | ----------- | ------ | ---------- |"
 
 setupApollo() {
   echo "Installing mp3info"
@@ -41,7 +45,6 @@ uploadMp3sToS3() {
   for i in "${mp3_paths[@]}";
   do
     echo "  Uploading <$i>..."
-    # s3_url=$(uploadToS3DEBUG $i)
     s3_url=$(uploadToS3 $i)
     echo "  Uploaded"
   done
@@ -81,8 +84,8 @@ updateXMLForAllMp3s() {
     open $s3_search_url
     echo -n "  S3 URL for <$i>: "
     read s3_url
-    echo "Updating itunes.xml ..."
-    updateXML $i $s3_url $description $date $ep_number
+    echo "Updating itunes.xml and readme.md..."
+    updateXMLAndReadme $i $s3_url $description $date $ep_number
     echo "  Done"
     echo "  Cleaning up..."
     lint
@@ -91,7 +94,7 @@ updateXMLForAllMp3s() {
   done
 }
 
-updateXML() {
+updateXMLAndReadme() {
   mp3_path=$1
   full_url=$2
   description=$3
@@ -106,7 +109,14 @@ updateXML() {
   duration=$(mp3info -p "%m:%02s\n" "${mp3_path}")
   bytes=$(wc -c < "${mp3_path}")
 
+  echo -n "  iTunes Link: "
+  read listen_link
+  echo -n "  Notes Link: "
+  read notes_link
+
+
   makeNewXMLHunkFile ${name} ${description} ${duration} ${bytes} ${url} ${date}
+  updateReade ${name} ${description} ${ep_number} ${listen_link} ${notes_link}
 }
 
 makeNewXMLHunkFile() {
@@ -146,17 +156,41 @@ makeNewXMLHunkFile() {
   printf '%s' "${new_itunes_xml[@]}" > itunes.xml.new
 }
 
+updateReadme() {
+  name=$1
+  description=$2
+  ep_number=$3
+  listen_link=$4
+  notes_link=$5
+
+  new_episode_line="${readme_new_episode_line}"
+  new_episode_line+="| 2 | ${ep_number} | ${name} | ${description}| ${listen_link} | ${notes_link} |\n"
+
+  new_readme=()
+  readarray a < "../README.md"
+  for i in "${a[@]}";
+  do
+    i=${i}/${readme_new_episode_line}/${new_episode_line}
+    new_readme+=("${i}")
+  done
+  printf '%s' "${new_readme[@]}" > README.md
+}
+
+
 lint() {
   xmllint --format itunes.xml.new > itunes.xml.new.formatted
   mv itunes.xml.new.formatted itunes.xml.new
 }
 
 pushXML() {
+  echo -n "Pushing to GitHub..."
+  # Do the uploading of the xml and validate
   date=$(date '+%a, %d %b %Y')
+  # TODO update readme list
   mv itunes.xml.new itunes.xml
-  addFiles itunes.xml
-  stageCommit "Episode added for $date"
-  pushCommit
+  git add itunes.xml
+  git commit -m "Episode added for $date"
+  git push
   echo "Done"
 }
 
@@ -213,6 +247,7 @@ helpStringFunction() {
   echo "-p|--push                    : Push the iTunes XML to GitHub"
   echo "-v|--validate                : Validate the XML"
   echo "-r|--refresh                 : Refresh the URL on the iTunes website"
+  echo "-e|--update-readme           : Update the Readme file with a section for the new episodes"
   echo "-c|--clean <directory>       : Remove dangling temporary files"
   echo "-s|--setup)                  : Setup Apollo and install requirements"
 }
@@ -243,6 +278,10 @@ case $1 in
 
     -r|--refresh)
       refreshURL
+    ;;
+
+    -e|--update-readme)
+      updateReadme
     ;;
 
     -c|--clean)
