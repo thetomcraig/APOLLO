@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/helper_functions.sh
 
 xml_path="."
-release_date=$(date '+%a %d %b %Y')
+release_date=$(date '+%a, %d %b %Y %T %Z')
 template_filename=./episode_hunk.xml
 new_hunk_filename="${template_filename}.new"
 validator_url="http://castfeedvalidator.com/?url=https://raw.githubusercontent.com/thetomcraig/total-immersion-podcast/master/xml_stuff/itunes.xml"
@@ -206,6 +206,7 @@ validateXML() {
 
 refreshURL() {
   open "https://podcastsconnect.apple.com/"
+  open "https://podcasters.spotify.com/catalog"
 }
 
 diffXMLsAndReplace() {
@@ -247,7 +248,7 @@ helpStringFunction() {
           Read all mp3 files from the directory and upload them to S3"
   echo "-x|--xml-update <directory> <itunes XML file path>:
           Read all mp3 files from the directory and make a new  XML entry for each one "
-  echo "-p|--push:
+  echo "-p|--push <itunes XML file path>:
           Push the iTunes XML to GitHub"
   echo "-v|--validate:
           Validate the XML"
