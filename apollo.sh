@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${DIR}/helper_functions.sh
 source ${DIR}/git_functions.sh
@@ -158,8 +160,10 @@ lint() {
 }
 
 pushXML() {
+  path_to_xml=$1
+
   date=$(date '+%a, %d %b %Y')
-  mv itunes.xml.new itunes.xml
+  # mv itunes.xml.new itunes.xml
   # TODO extract the path from this and cd to it
   cd $(dirname "${path_to_xml}")
   xml_file=$(basename "${path_to_xml}")
