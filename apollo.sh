@@ -179,7 +179,7 @@ validateXML() {
 }
 
 refreshURL() {
-  open "https://podcastsconnect.apple.com/"
+  open "https://podcastsconnect.apple.com/my-podcasts"
   open "https://podcasters.spotify.com/catalog"
 }
 
