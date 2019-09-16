@@ -7,7 +7,7 @@ addFiles() {
 }
 
 stageCommit() {
-  commit_msg = $1
+  commit_msg=$1
   git commit -m "Episode added for $commit_msg"
 }
 
