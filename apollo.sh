@@ -117,7 +117,6 @@ updateXML() {
   bytes=$(wc -c < "${mp3_path}")
 
   makeNewXMLHunkFile ${name} ${description} ${duration} ${bytes} ${url} ${date}
-  # updateReade ${name} ${description} ${ep_number} ${listen_link} ${notes_link}
 }
 
 makeNewXMLHunkFile() {
@@ -136,7 +135,7 @@ makeNewXMLHunkFile() {
   do
     i=${i/TITLE/$name}
     i=${i/SUMMARY/${description}}
-    i=${i/TIME/${time}}
+    i=${i/TIME/${duration}}
     i=${i/LENGTH/${bytes}}
     i=${i/LINK/${url}}
     i=${i/DATE/${date}}
